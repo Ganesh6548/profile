@@ -1,17 +1,15 @@
 /* ============================================================
-   TOKENS — palette from the studio-vignette video
+   TOKENS
    ============================================================ */
 :root{
+  --void:        #0a0910;
+  --void-deep:   #06050a;
   --wine-core:   #4d1017;
   --wine-deep:   #2d050a;
-  --wine-shadow: #170305;
-  --void:        #0a0a0a;
-  --charcoal:    #120305;
 
   --lavender:      #b8a8d6;
   --lavender-soft: #cfc2e6;
   --lavender-deep: #8d7ba8;
-  --mauve:         #6f5f88;
   --warm:          #c88a58;
 
   --cream:   #f8f4f4;
@@ -44,68 +42,73 @@ body{
 }
 
 /* ============================================================
-   BACKGROUND STACK (z-order: video 0 → wrap 6 → nav 110)
+   ATHLETIC BACKGROUND STACK
+   z-order: backdrop 0 → streaks/grid 1 → vignette 2 → grain 3
+            → glow 4 → wrap 6 → nav 110
    ============================================================ */
 
-/* --- Vercel Blob video, full-bleed --- */
-.bg-video{
-  position:fixed;inset:0;z-index:0;
-  width:100%;height:100%;
-  object-fit:cover;
-  object-position:70% center;
-  pointer-events:none;
-}
-
-/* --- Wine tint sitting ON TOP of the video --- */
 .backdrop{
-  position:fixed;inset:0;z-index:1;pointer-events:none;
+  position:fixed;inset:0;z-index:0;pointer-events:none;
   background:
-    radial-gradient(circle at 50% 44%,
-        rgba(77,16,23,.72) 0%,
-        rgba(61,12,19,.78) 24%,
-        rgba(45,5,10,.86) 48%,
-        rgba(28,4,7,.92) 70%,
-        rgba(16,2,4,.96) 86%,
-        rgba(10,10,10,.985) 100%);
+    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(141,123,168,.20), transparent 65%),
+    radial-gradient(ellipse 55% 45% at 82% 88%, rgba(200,138,88,.14), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 15% 12%, rgba(77,16,23,.30), transparent 70%),
+    linear-gradient(180deg, #0a0910 0%, #08060a 50%, #0c0710 100%);
 }
 
+/* Diagonal speed streaks — track-lane feel */
+.streaks{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background: repeating-linear-gradient(
+    115deg,
+    transparent 0,
+    transparent 240px,
+    rgba(184,168,214,.06) 240px,
+    rgba(184,168,214,.06) 241px,
+    transparent 241px,
+    transparent 520px
+  );
+  -webkit-mask-image: radial-gradient(ellipse 95% 80% at 50% 48%, #000 25%, transparent 88%);
+          mask-image: radial-gradient(ellipse 95% 80% at 50% 48%, #000 25%, transparent 88%);
+}
+
+/* Court-grid lines */
+.grid-lines{
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.55;
+  background-image:
+    linear-gradient(rgba(184,168,214,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184,168,214,.06) 1px, transparent 1px);
+  background-size: 96px 96px;
+  -webkit-mask-image: radial-gradient(ellipse 62% 55% at 50% 46%, #000 15%, transparent 82%);
+          mask-image: radial-gradient(ellipse 62% 55% at 50% 46%, #000 15%, transparent 82%);
+}
+
+/* Edge darkening */
 .vignette{
   position:fixed;inset:0;z-index:2;pointer-events:none;
-  background:
-    radial-gradient(ellipse 82% 74% at 50% 46%,
-        transparent 0%,
-        rgba(23,3,5,.35) 58%,
-        rgba(10,10,10,.72) 84%,
-        rgba(6,6,6,.94) 100%);
+  background: radial-gradient(ellipse 82% 74% at 50% 46%,
+      transparent 0%,
+      rgba(6,6,10,.35) 58%,
+      rgba(4,4,8,.78) 86%,
+      rgba(2,2,4,.96) 100%);
 }
 
-.bloom-cool{
-  position:fixed;z-index:3;pointer-events:none;
-  top:-14%;right:-8%;width:62vw;height:62vw;max-width:900px;max-height:900px;
-  background:radial-gradient(circle, rgba(184,168,214,.10) 0%, rgba(141,123,168,.05) 38%, transparent 66%);
-  filter:blur(50px);
-}
-.bloom-warm{
-  position:fixed;z-index:3;pointer-events:none;
-  bottom:-18%;left:-10%;width:52vw;height:52vw;max-width:760px;max-height:760px;
-  background:radial-gradient(circle, rgba(200,138,88,.085) 0%, rgba(200,138,88,.035) 40%, transparent 68%);
-  filter:blur(56px);
-}
-
+/* Film grain */
 .grain{
-  position:fixed;inset:0;z-index:4;pointer-events:none;opacity:.05;
+  position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.045;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");
   mix-blend-mode:overlay;
 }
 
+/* Cursor-following glow */
 .glow{
-  position:fixed;top:0;left:0;z-index:5;pointer-events:none;
+  position:fixed;top:0;left:0;z-index:4;pointer-events:none;
   width:640px;height:640px;margin:-320px 0 0 -320px;
   border-radius:50%;
   background:radial-gradient(circle,
-      rgba(184,168,214,.15) 0%,
+      rgba(184,168,214,.16) 0%,
       rgba(184,168,214,.06) 36%,
-      rgba(200,138,88,.03) 56%,
+      rgba(200,138,88,.04) 56%,
       transparent 70%);
   opacity:0;
   transition:opacity .8s var(--ease);
@@ -219,11 +222,17 @@ body{
   color:rgba(248,244,244,.016);
   user-select:none;pointer-events:none;line-height:1;
 }
+
+/* Rig LEFT, text RIGHT */
 .hero-grid{
   position:relative;
-  display:grid;grid-template-columns:1.15fr .85fr;
-  gap:64px;align-items:center;width:100%;
+  display:grid;
+  grid-template-columns:.9fr 1.1fr;
+  gap:64px;
+  align-items:center;
+  width:100%;
 }
+
 .eyebrow{
   display:inline-flex;align-items:center;gap:10px;
   font-size:10.5px;font-weight:500;letter-spacing:.19em;text-transform:uppercase;
@@ -305,45 +314,85 @@ h1.hero-name .accent{
   background:var(--lavender-deep);opacity:.6;flex:none;
 }
 
-/* ---------- Character rig ---------- */
+/* ============================================================
+   CHARACTER RIG — perfect circle, no rectangle
+   ============================================================ */
 .rig-stage{
-  position:relative;display:flex;align-items:center;justify-content:center;
-  min-height:440px;
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  min-height:480px;
 }
+
 .rig-halo{
-  position:absolute;width:120%;aspect-ratio:1;border-radius:50%;
+  position:absolute;
+  width:118%;aspect-ratio:1;border-radius:50%;
   background:radial-gradient(circle,
-      rgba(184,168,214,.15) 0%,
-      rgba(77,16,23,.30) 40%,
-      rgba(45,5,10,.18) 58%,
-      transparent 72%);
-  filter:blur(40px);pointer-events:none;
+      rgba(184,168,214,.22) 0%,
+      rgba(141,123,168,.10) 38%,
+      rgba(200,138,88,.06) 58%,
+      transparent 74%);
+  filter:blur(46px);
+  pointer-events:none;
 }
+
 .rig{
-  position:relative;width:100%;max-width:390px;aspect-ratio:1/1;
-  perspective:1000px;
+  position:relative;
+  width:100%;
+  max-width:440px;
+  aspect-ratio:1 / 1;
+  perspective:1200px;
 }
+
+/* The circular clip. overflow:hidden + border-radius:50% means
+   ANY content inside is clipped to a circle — no rectangle can
+   ever appear, no matter what the video file looks like. */
 .rig-tilt{
-  position:absolute;inset:0;
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  overflow:hidden;
   transform-style:preserve-3d;
   will-change:transform;
+  background:#0a0510;
+  box-shadow:
+    0 0 0 1px rgba(184,168,214,.30),
+    0 0 0 8px rgba(184,168,214,.055),
+    0 0 0 9px rgba(200,138,88,.10),
+    0 30px 90px -30px rgba(0,0,0,.95),
+    0 0 110px -20px rgba(184,168,214,.42),
+    0 0 180px -50px rgba(200,138,88,.36);
 }
-.rig-head,.rig-pupils{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none;
+
+.rig-head{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+  border-radius:50%;
+  user-select:none;
+  -webkit-user-drag:none;
+  pointer-events:none;
 }
-.rig-head{position:relative;z-index:1}
-.rig-pupils{z-index:2;will-change:transform}
+
+/* Rotating dashed ring sits OUTSIDE the circle */
 .rig-ring{
-  position:absolute;inset:-6%;border-radius:50%;
-  border:1px dashed rgba(184,168,214,.20);
-  animation:spin 46s linear infinite;pointer-events:none;
+  position:absolute;
+  inset:-7%;
+  border-radius:50%;
+  border:1px dashed rgba(184,168,214,.22);
+  animation:spin 52s linear infinite;
+  pointer-events:none;
 }
 .rig-ring::after{
-  content:'';position:absolute;top:-3.5px;left:50%;width:7px;height:7px;
-  border-radius:50%;background:var(--lavender);
+  content:'';
+  position:absolute;top:-3.5px;left:50%;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--lavender);
   transform:translateX(-50%);
-  box-shadow:0 0 14px 3px rgba(184,168,214,.7);
+  box-shadow:0 0 14px 3px rgba(184,168,214,.75);
 }
 
 /* ============================================================
@@ -563,14 +612,15 @@ footer .brand{font-size:13px}
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .95s var(--ease),transform .95s var(--ease)}
 .reveal.in{opacity:1;transform:none}
 
-/* Responsive */
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width:1000px){
   .hero-grid{grid-template-columns:1fr;gap:48px}
-  .rig-stage{order:-1;min-height:320px}
-  .rig{max-width:300px}
+  .rig{max-width:320px}
+  .rig-stage{min-height:360px}
   .about-grid{grid-template-columns:1fr;gap:42px}
   .exp{grid-template-columns:1fr;gap:18px;padding:30px}
-  .bloom-cool,.bloom-warm{opacity:.6}
 }
 @media (max-width:760px){
   .nav-links,.nav-cta{display:none}
@@ -584,6 +634,5 @@ footer .brand{font-size:13px}
   .ghost{font-size:clamp(90px,26vw,160px)}
 }
 @media (prefers-reduced-motion:reduce){
-  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
   html{scroll-behavior:auto}
 }
