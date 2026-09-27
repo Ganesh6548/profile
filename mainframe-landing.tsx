@@ -109,7 +109,7 @@ export default function MainframeLanding() {
         playsInline
         preload="auto"
       >
-        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4" type="video/mp4" />
+        <source src="https://ashpikminev8xmwr.private.blob.vercel-storage.com/150155.mp4?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfQXNIUElrbWluRXY4WE1XUiIsIm93bmVySWQiOiJ0ZWFtX2h6a0ZHUHdYekZtb2xtMUZxaWVvZ1lRZyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzkwNTU3MjM3MzA2LCJpYXQiOjE3OTA1MTM4NDMyODZ9.JLOhM6vnsGW_t_b0bzJg185TZIImg3oW7CdJSfACUBk&vercel-blob-signature=4_7Uz9Yj6CXO4d_8T1iZSeajYtvo6urBPbGp-mgRQmA" />
       </video>
 
       {/* Navbar */}
