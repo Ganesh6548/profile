@@ -1,303 +1,248 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-// Typewriter Hook
-const useTypewriter = (text: string, speed = 38, startDelay = 600) => {
+// --- Custom Hook: Typewriter ---
+function useTypewriter(text: string, speed: number = 38, startDelay: number = 600) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      let index = 0;
-      intervalRef.current = setInterval(() => {
-        if (index <= text.length) {
-          setDisplayed(text.slice(0, index));
-          index++;
-        } else {
+    let interval: ReturnType<typeof setInterval>;
+    const timeout = setTimeout(() => {
+      let i = 0;
+      interval = setInterval(() => {
+        setDisplayed(text.slice(0, i + 1));
+        i++;
+        if (i >= text.length) {
+          clearInterval(interval);
           setDone(true);
-          if (intervalRef.current) clearInterval(intervalRef.current);
         }
       }, speed);
     }, startDelay);
 
     return () => {
-      clearTimeout(timeoutId);
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      clearTimeout(timeout);
+      if (interval) clearInterval(interval);
     };
   }, [text, speed, startDelay]);
 
   return { displayed, done };
-};
+}
 
-// Copy to Clipboard Hook
-const useCopyToClipboard = () => {
-  const copy = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-  return { copy };
-};
-
+// --- Main Component ---
 export default function MainframeLanding() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showPills, setShowPills] = useState(false);
+  const [copied, setCopied] = useState(false);
+  
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showActionButtons, setShowActionButtons] = useState(false);
-  const prevXRef = useRef(0);
-  const targetTimeRef = useRef(0);
+  const prevX = useRef<number>(0);
+  const targetTime = useRef<number>(0);
+  const isSeeking = useRef<boolean>(false);
+
+  // Typewriter hook usage
   const { displayed, done } = useTypewriter(
-    'Glad you stopped in. Good taste tends to find us. Now, what are we building?',
+    "Glad you stopped in. Good taste tends to find us. Now, what are we building?",
     38,
     600
   );
-  const { copy } = useCopyToClipboard();
 
-  // Mouse scrub video control
+  // Show pills 400ms after mount
+  useEffect(() => {
+    const timer = setTimeout(() => setShowPills(true), 400);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Video Mouse Scrubbing Logic
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!videoRef.current) return;
+      if (!videoRef.current || !videoRef.current.duration) return;
 
       const currentX = e.clientX;
-      const delta = currentX - prevXRef.current;
+      if (prevX.current === 0) {
+        prevX.current = currentX;
+        return;
+      }
+
+      const delta = currentX - prevX.current;
+      prevX.current = currentX;
+
+      // Update target time based on horizontal mouse movement
       const sensitivity = 0.8;
-      const offset = (delta / window.innerWidth) * sensitivity * videoRef.current.duration;
-      
-      targetTimeRef.current = Math.max(0, Math.min(videoRef.current.duration, targetTimeRef.current + offset));
-      videoRef.current.currentTime = targetTimeRef.current;
-      
-      prevXRef.current = currentX;
+      targetTime.current += (delta / window.innerWidth) * sensitivity * videoRef.current.duration;
+
+      // Clamp target time
+      targetTime.current = Math.max(0, Math.min(targetTime.current, videoRef.current.duration));
+
+      if (!isSeeking.current) {
+        isSeeking.current = true;
+        videoRef.current.currentTime = targetTime.current;
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Show action buttons after 400ms
-  useEffect(() => {
-    const timer = setTimeout(() => setShowActionButtons(true), 400);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleCopyEmail = () => {
-    copy('hello@mainframe.co');
+  // Video onSeeked handler to prevent seek-flooding
+  const handleSeeked = () => {
+    if (!videoRef.current) return;
+    
+    // Check if we need to seek again to catch up to the latest target time
+    if (Math.abs(videoRef.current.currentTime - targetTime.current) > 0.05) {
+      videoRef.current.currentTime = targetTime.current;
+    } else {
+      isSeeking.current = false;
+    }
   };
 
-  const navLinks = [
-    { label: 'Labs', href: '#' },
-    { label: 'Studio', href: '#' },
-    { label: 'Openings', href: '#' },
-    { label: 'Shop', href: '#' },
-  ];
-
-  const actionButtons = [
-    { label: 'Pitch us an idea', href: '#' },
-    { label: 'Come work here', href: '#' },
-    { label: 'Send a brief hello', href: '#' },
-    { label: 'See how we operate', href: '#' },
-  ];
+  // Copy to clipboard handler
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText('hello@mainframe.co');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className="relative w-full h-screen bg-white overflow-hidden">
+    <div className="relative w-full h-screen overflow-hidden bg-white">
       {/* Background Video */}
       <video
         ref={videoRef}
-        className="fixed inset-0 w-full h-full object-cover"
-        style={{ objectPosition: '70% center', zIndex: 0 }}
+        src="https://ashpikminev8xmwr.private.blob.vercel-storage.com/150155.mp4?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfQXNIUElrbWluRXY4WE1XUiIsIm93bmVySWQiOiJ0ZWFtX2h6a0ZHUHdYekZtb2xtMUZxaWVvZ1lRZyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzkwNTU3MjM3MzA2LCJpYXQiOjE3OTA1MTM4NDMyODZ9.JLOhM6vnsGW_t_b0bzJg185TZIImg3oW7CdJSfACUBk&vercel-blob-signature=4_7Uz9Yj6CXO4d_8T1iZSeajYtvo6urBPbGp-mgRQmA"
+        className="fixed inset-0 z-0 object-cover"
+        style={{ objectPosition: '70% center' }}
         muted
         playsInline
         preload="auto"
-      >
-        <source src="https://ashpikminev8xmwr.private.blob.vercel-storage.com/150155.mp4?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfQXNIUElrbWluRXY4WE1XUiIsIm93bmVySWQiOiJ0ZWFtX2h6a0ZHUHdYekZtb2xtMUZxaWVvZ1lRZyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzkwNTU3MjM3MzA2LCJpYXQiOjE3OTA1MTM4NDMyODZ9.JLOhM6vnsGW_t_b0bzJg185TZIImg3oW7CdJSfACUBk&vercel-blob-signature=4_7Uz9Yj6CXO4d_8T1iZSeajYtvo6urBPbGp-mgRQmA" />
-      </video>
+        onSeeked={handleSeeked}
+      />
 
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-10 px-5 sm:px-8 py-4 sm:py-5 flex justify-between items-center bg-white/5 backdrop-blur-sm">
+      <nav className="fixed top-0 left-0 right-0 z-10 flex justify-between items-center px-5 sm:px-8 py-4 sm:py-5">
         {/* Logo */}
-        <div className="flex flex-row gap-3 items-center">
-          <span
-            className="text-[21px] sm:text-[26px] font-black tracking-tight text-black"
+        <div className="flex items-center gap-3">
+          <span 
+            className="text-[21px] sm:text-[26px] tracking-tight text-black select-none"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
-            Mainframe®
+            Mainframe(R)
           </span>
-          <span className="text-[25px] sm:text-[30px] text-black select-none" style={{ letterSpacing: '-0.02em' }}>
+          <span 
+            className="text-[25px] sm:text-[30px] text-black select-none"
+            style={{ letterSpacing: '-0.02em' }}
+          >
             ✳︎
           </span>
         </div>
 
         {/* Desktop Nav Links */}
-        <div className="hidden md:flex flex-row gap-2 text-[23px] text-black">
-          {navLinks.map((link, idx) => (
-            <React.Fragment key={idx}>
-              <a href={link.href} className="hover:opacity-60 transition-opacity">
-                {link.label}
-              </a>
-              {idx < navLinks.length - 1 && <span>, </span>}
-            </React.Fragment>
-          ))}
+        <div className="hidden md:flex items-center text-[23px] text-black">
+          <a href="#" className="hover:opacity-60 transition-opacity">Labs</a>,&nbsp;
+          <a href="#" className="hover:opacity-60 transition-opacity">Studio</a>,&nbsp;
+          <a href="#" className="hover:opacity-60 transition-opacity">Openings</a>,&nbsp;
+          <a href="#" className="hover:opacity-60 transition-opacity">Shop</a>
         </div>
 
         {/* Desktop CTA */}
-        <a
-          href="#"
-          className="hidden md:inline text-[23px] text-black underline underline-offset-2 hover:opacity-60 transition-opacity"
-        >
-          Get in touch
-        </a>
-
-        {/* Mobile Hamburger */}
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden flex flex-col gap-[5px]"
-          aria-label="Toggle menu"
-        >
-          <div
-            className="w-6 h-[2px] bg-black transition-all duration-300"
-            style={{
-              transform: isMobileMenuOpen ? 'rotate(45deg) translateY(7px)' : 'rotate(0)',
-            }}
-          />
-          <div
-            className="w-6 h-[2px] bg-black transition-all duration-300"
-            style={{ opacity: isMobileMenuOpen ? 0 : 1 }}
-          />
-          <div
-            className="w-6 h-[2px] bg-black transition-all duration-300"
-            style={{
-              transform: isMobileMenuOpen ? 'rotate(-45deg) translateY(-7px)' : 'rotate(0)',
-            }}
-          />
-        </button>
-      </nav>
-
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-9 bg-white/95 backdrop-blur-sm md:hidden flex flex-col justify-center items-start px-8 gap-8 pt-20"
-          style={{
-            opacity: isMobileMenuOpen ? 1 : 0,
-            pointerEvents: isMobileMenuOpen ? 'auto' : 'none',
-            transition: 'opacity 0.3s ease',
-          }}
-        >
-          {navLinks.map((link) => (
-            <a key={link.label} href={link.href} className="text-[32px] font-medium text-black">
-              {link.label}
-            </a>
-          ))}
-          <a href="#" className="text-[32px] font-medium text-black underline">
+        <div className="hidden md:block">
+          <a href="#" className="text-[23px] text-black underline underline-offset-2 hover:opacity-60 transition-opacity">
             Get in touch
           </a>
         </div>
-      )}
+
+        {/* Mobile Hamburger */}
+        <button 
+          className="md:hidden flex flex-col gap-[5px] z-20"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          <span className={`w-6 h-[2px] bg-black transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+          <span className={`w-6 h-[2px] bg-black transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`} />
+          <span className={`w-6 h-[2px] bg-black transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+        </button>
+      </nav>
+
+      {/* Mobile Overlay */}
+      <div 
+        className={`fixed inset-0 z-[9] bg-white/95 backdrop-blur-sm flex flex-col justify-center px-8 gap-8 transition-opacity duration-300 md:hidden ${
+          isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <a href="#" className="text-[32px] font-medium text-black">Labs</a>
+        <a href="#" className="text-[32px] font-medium text-black">Studio</a>
+        <a href="#" className="text-[32px] font-medium text-black">Openings</a>
+        <a href="#" className="text-[32px] font-medium text-black">Shop</a>
+        <a href="#" className="text-[32px] font-medium text-black underline underline-offset-4">Get in touch</a>
+      </div>
 
       {/* Hero Section */}
-      <section
-        className="relative z-1 h-screen flex flex-col overflow-hidden px-5 sm:px-8 md:px-10"
-        style={{
-          justifyContent: window.innerWidth < 768 ? 'flex-end' : 'center',
-          paddingBottom: window.innerWidth < 768 ? '3rem' : '0',
-        }}
-      >
+      <section className="relative z-[1] h-screen flex flex-col justify-end pb-12 md:justify-center md:pb-0 px-5 sm:px-8 md:px-10 overflow-hidden">
         <div className="max-w-xl relative z-10">
+          
           {/* Blurred Intro Label */}
-          <div
+          <div 
             className="pointer-events-none select-none mb-5 sm:mb-6"
             style={{
               fontSize: 'clamp(18px, 4vw, 26px)',
               lineHeight: 1.3,
               fontWeight: 400,
               color: '#000',
-              filter: 'blur(4px)',
+              filter: 'blur(4px)'
             }}
           >
-            <p>Hey there, meet A.R.I.A,</p>
-            <p>Mainframe's Adaptive Response Interface Agent</p>
+            <div>Hey there, meet A.R.I.A,</div>
+            <div>Mainframe's Adaptive Response Interface Agent</div>
           </div>
 
           {/* Typewriter Text */}
-          <div
-            className="mb-5 sm:mb-6 min-h-[54px] text-black font-normal"
+          <div 
+            className="mb-5 sm:mb-6 text-black"
             style={{
               fontSize: 'clamp(18px, 4vw, 26px)',
               lineHeight: 1.35,
               fontWeight: 400,
+              minHeight: '54px'
             }}
           >
             {displayed}
             {!done && (
-              <span
-                className="inline-block w-[2px] h-[1.1em] bg-black align-middle ml-[2px]"
-                style={{
-                  animation: 'blink 1s step-end infinite',
-                }}
-              />
+              <span className="inline-block w-[2px] h-[1.1em] bg-black align-middle ml-[2px] animate-blink" />
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div
-            className="flex flex-wrap gap-y-1"
-            style={{
-              opacity: showActionButtons ? 1 : 0,
-              transform: showActionButtons ? 'translateY(0)' : 'translateY(8px)',
-              transition: 'opacity 0.4s ease, transform 0.4s ease',
-            }}
+          {/* Action Pill Buttons */}
+          <div 
+            className={`flex flex-wrap gap-y-1 transition-all duration-400 ease-out ${
+              showPills ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            }`}
           >
-            {/* White Pill Buttons */}
-            {actionButtons.map((btn) => (
-              <a
-                key={btn.label}
-                href={btn.href}
-                className="inline-flex items-center justify-center bg-white text-black rounded-full text-[13px] sm:text-[15px] px-4 sm:px-5 py-[0.3em] mx-[0.2em] mb-[0.4em] whitespace-nowrap border border-black/10 hover:bg-black hover:text-white transition-colors duration-200"
+            {/* White Pills */}
+            {['Pitch us an idea', 'Come work here', 'Send a brief hello', 'See how we operate'].map((label) => (
+              <button
+                key={label}
+                className="inline-flex items-center justify-center bg-white text-black border border-black/10 rounded-full text-[13px] sm:text-[15px] px-4 sm:px-5 py-[0.3em] mx-[0.2em] mb-[0.4em] whitespace-nowrap hover:bg-black hover:text-white transition-colors duration-200"
               >
-                {btn.label}
-              </a>
+                {label}
+              </button>
             ))}
 
-            {/* Outline Pill Button */}
+            {/* Outline Pill with Copy Icon */}
             <button
               onClick={handleCopyEmail}
-              className="inline-flex items-center justify-center text-white bg-transparent rounded-full text-[13px] sm:text-[15px] px-4 sm:px-5 py-[0.3em] mx-[0.2em] mb-[0.4em] whitespace-nowrap border border-white gap-2 sm:gap-3 hover:bg-white hover:text-black transition-colors duration-200"
+              className="inline-flex items-center justify-center text-white bg-transparent border border-white rounded-full text-[13px] sm:text-[15px] px-4 sm:px-5 py-[0.3em] mx-[0.2em] mb-[0.4em] gap-2 sm:gap-3 hover:bg-white hover:text-black transition-colors duration-200"
             >
               <span>
-                Reach us:{' '}
-                <span className="underline underline-offset-1">hello@mainframe.co</span>
+                Reach us: <span className="underline underline-offset-1">hello@mainframe.co</span>
               </span>
               {/* Copy Icon SVG */}
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect x="4" y="4" width="6" height="6" stroke="currentColor" strokeWidth="0.75" />
-                <rect x="2" y="2" width="6" height="6" stroke="currentColor" strokeWidth="0.75" />
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
               </svg>
+              {copied && <span className="text-xs ml-1">Copied!</span>}
             </button>
           </div>
+
         </div>
       </section>
-
-      {/* Blink Animation */}
-      <style>{`
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-        
-        :root {
-          --font-heading: 'HelveticaNowDisplay-Medium', 'Helvetica Neue', Arial, sans-serif;
-          --font-body: 'HelveticaNowDisplayW01-Rg', 'Helvetica Neue', Arial, sans-serif;
-        }
-        
-        body {
-          font-family: var(--font-body);
-        }
-      `}</style>
     </div>
   );
 }
