@@ -5,7 +5,6 @@ const useTypewriter = (text: string, speed = 38, startDelay = 600) => {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       let index = 0;
