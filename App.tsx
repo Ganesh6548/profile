@@ -1,14 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 
 /* ============================================================
-   VERCEL BLOB URLS
+   VERCEL BLOB URL — the character video
    ============================================================ */
-const VIDEO_URL =
+const RIG_VIDEO_URL =
   'https://ashpikminev8xmwr.private.blob.vercel-storage.com/150155_clean_1790524427344.mp4?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfQXNIUElrbWluRXY4WE1XUiIsIm93bmVySWQiOiJ0ZWFtX2h6a0ZHUHdYekZtb2xtMUZxaWVvZ1lRZyIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzkwNTY4NjQyNzM1LCJpYXQiOjE3OTA1MjU0NDI5Mzh9.Fhh9_6__iiDOk7UYbR-20QXZ1EKrasea7TTCUM_8-v0&vercel-blob-signature=k3ww7vG-orRpb7aGfXfdQ2D4g8pkvqe-47jwsS-3ucU';
-
-/* If you have a SEPARATE clip for the head/character, paste it here.
-   If it's the same video, leave this as-is. */
-const RIG_VIDEO_URL = VIDEO_URL;
 
 const CERTS = [
   'AICTE Internship — Data Analysis with LLM',
@@ -37,7 +33,6 @@ export default function App() {
   const glowRef = useRef<HTMLDivElement>(null);
   const rigRef = useRef<HTMLDivElement>(null);
   const rigTiltRef = useRef<HTMLDivElement>(null);
-  const bgVideoRef = useRef<HTMLVideoElement>(null);
   const rigVideoRef = useRef<HTMLVideoElement>(null);
   const yrRef = useRef<HTMLSpanElement>(null);
 
@@ -48,12 +43,11 @@ export default function App() {
 
   /* ---------- Video autoplay safety (iOS/Safari) ---------- */
   useEffect(() => {
-    [bgVideoRef.current, rigVideoRef.current].forEach((v) => {
-      if (!v) return;
-      v.muted = true;
-      v.play().catch(() => {
-        /* autoplay blocked — silent fallback, video just won't move */
-      });
+    const v = rigVideoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.play().catch(() => {
+      /* autoplay blocked — silent fallback */
     });
   }, []);
 
@@ -115,7 +109,7 @@ export default function App() {
     return () => io.disconnect();
   }, []);
 
-  /* ---------- Pointer tracking + rig tilt loop ---------- */
+  /* ---------- Pointer tracking + rig follow loop ---------- */
   useEffect(() => {
     const glow = glowRef.current;
     const rig = rigRef.current;
@@ -127,9 +121,10 @@ export default function App() {
     let hasMoved = false;
     let idleTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const MAX_TILT = 10;   // degrees of rotation on the rig video
-    const MAX_SHIFT = 9;   // px of translation
-    const LERP = 0.085;
+    /* ---- TUNED FOR VISIBLE MOVEMENT ---- */
+    const MAX_TILT = 16;    // degrees of rotation — head visibly turns
+    const MAX_SHIFT = 46;   // px of translation — head visibly slides left/right
+    const LERP = 0.11;      // snappier follow, less laggy
 
     const onMove = (e: MouseEvent) => {
       target.x = e.clientX;
@@ -160,7 +155,6 @@ export default function App() {
     window.addEventListener('mouseleave', onLeave);
     window.addEventListener('touchmove', onTouch, { passive: true });
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let raf = 0;
 
     const frame = () => {
@@ -169,15 +163,19 @@ export default function App() {
 
       glow.style.transform = `translate3d(${current.x.toFixed(2)}px,${current.y.toFixed(2)}px,0)`;
 
-      if (!reduceMotion) {
-        const nx = (current.x / window.innerWidth - 0.5) * 2;
-        const ny = (current.y / window.innerHeight - 0.5) * 2;
+      /* Normalised offset from viewport centre (-1 .. 1).
+         Left edge => -1, Right edge => +1. This works because the rig
+         is on the LEFT of the hero — so moving to screen-left slides
+         the head left, screen-right slides it right. */
+      const nx = (current.x / window.innerWidth - 0.5) * 2;
+      const ny = (current.y / window.innerHeight - 0.5) * 2;
 
-        tilt.style.transform =
-          `perspective(1000px) rotateY(${(nx * MAX_TILT).toFixed(2)}deg) ` +
-          `rotateX(${(-ny * MAX_TILT).toFixed(2)}deg) ` +
-          `translate3d(${(nx * MAX_SHIFT).toFixed(2)}px,${(ny * MAX_SHIFT).toFixed(2)}px,0)`;
-      }
+      tilt.style.transform =
+        `perspective(1200px) ` +
+        `rotateY(${(nx * MAX_TILT).toFixed(2)}deg) ` +
+        `rotateX(${(-ny * MAX_TILT).toFixed(2)}deg) ` +
+        `translate3d(${(nx * MAX_SHIFT).toFixed(2)}px,` +
+                    `${(ny * MAX_SHIFT).toFixed(2)}px,0)`;
 
       raf = requestAnimationFrame(frame);
     };
@@ -198,20 +196,10 @@ export default function App() {
 
   return (
     <>
-      {/* ===== BACKGROUND STACK ===== */}
-      <video
-        ref={bgVideoRef}
-        className="bg-video"
-        src={VIDEO_URL}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-      />
+      {/* ===== ATHLETIC BACKGROUND STACK ===== */}
       <div className="backdrop" />
-      <div className="bloom-cool" />
-      <div className="bloom-warm" />
+      <div className="streaks" />
+      <div className="grid-lines" />
       <div className="vignette" />
       <div className="grain" />
       <div className="glow" ref={glowRef} />
@@ -262,6 +250,27 @@ export default function App() {
           </div>
 
           <div className="container hero-grid">
+            {/* ===== CHARACTER RIG — circular video, LEFT side ===== */}
+            <div className="rig-stage">
+              <div className="rig-halo" />
+              <div className="rig" ref={rigRef}>
+                <div className="rig-ring" />
+                <div className="rig-tilt" ref={rigTiltRef}>
+                  <video
+                    ref={rigVideoRef}
+                    className="rig-head"
+                    src={RIG_VIDEO_URL}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* ===== TEXT — right side ===== */}
             <div>
               <div className="eyebrow">
                 <span className="dot" /> Available for 2026 roles
@@ -308,26 +317,6 @@ export default function App() {
                 </span>
                 <span>Immediate joiner</span>
                 <span>Open to relocation</span>
-              </div>
-            </div>
-
-            {/* ===== CHARACTER RIG — video instead of PNGs ===== */}
-            <div className="rig-stage">
-              <div className="rig-halo" />
-              <div className="rig" ref={rigRef}>
-                <div className="rig-ring" />
-                <div className="rig-tilt" ref={rigTiltRef}>
-                  <video
-                    ref={rigVideoRef}
-                    className="rig-head"
-                    src={RIG_VIDEO_URL}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                  />
-                </div>
               </div>
             </div>
           </div>
