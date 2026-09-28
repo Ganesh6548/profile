@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ganesh V — Creative Developer Portfolio</title>
-    <meta name="description" content="Portfolio of Ganesh V, a Full-Stack Developer and AI/Data Science graduate specializing in modern web experiences." />
-    <meta name="theme-color" content="#2d050a" />
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+         body{
+            margin:0px;
+            padding:0px;
+            display:flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas{
+            box-shadow: black 20px 10px 50px;
 
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232d050a'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-style='italic' font-size='18' fill='%23b8a8d6' text-anchor='middle'%3EG%3C/text%3E%3C/svg%3E" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/main.tsx"></script>
-  </body>
+        }
+    </style>
+</head>
+<body>
+    <h1>Snake Game</h1>
+    <canvas id="game" width="400" height="400"/>
+</body>
+<script src="index.js"></script>
 </html>
