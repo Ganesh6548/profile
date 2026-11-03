@@ -1099,3 +1099,35 @@ footer .brand{font-size:13px}
     font-size:38px;
   }
 }
+
+/* Clickable certificate cards */
+.cert {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.cert-link {
+  cursor: pointer;
+}
+
+.cert-link:hover {
+  transform: translateY(-2px);
+  opacity: 0.85;
+}
+
+.cert-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* subtle link affordance */
+.cert-link .cert-t::after {
+  content: ' ↗';
+  font-size: 0.75em;
+  opacity: 0.55;
+}
