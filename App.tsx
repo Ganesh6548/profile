@@ -16,24 +16,24 @@ const GAME_VIDEO_URL = 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/
 
 const RESUME_URL = 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/Ganesh_V_Resume_SOC_Analyst.pdf';
 
-const CERTS = [
-  'AICTE Internship — Data Analysis with LLM',
-  'Coursera — Certified Information Security Manager (CISM)',
-  'NPTEL — Java Certification',
-  'Cognitive Class — SQL Certification',
-  'Coursera — Data Analyst Professional Track',
-  'Coursera — Cybersecurity Specialization',
-  'Scaler — Java Certification',
-  'Great Learning — Excel for Data Analysis',
-  'Coursera — Ethical Hacking Certification',
-  'Cisco — Networking & Cybersecurity / CCNA',
-  'IAHV — Internship Certification',
-  'Forage — Data Science Job Simulation',
-  'Google — Foundations of Cybersecurity',
-  'Google — Connect & Protect: Network Security',
-  'Google — Prepare Data for Exploration',
-  'IBM — SQL & Relational Databases 101',
-  'L&T EduTech — Internship Certification',
+const CERTS: { title: string; url?: string }[] = [
+  { title: 'AICTE Internship — Data Analysis with LLM', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/Data%20science%20internship.pdf' },
+  { title: 'Coursera — Certified Information Security Manager (CISM)', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/CISM%201.pdf' },
+  { title: 'NPTEL — Java Certification', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/Programming%20in%20Java.pdf' },
+  { title: 'Cognitive Class — SQL Certification', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/IBM%20DB0101EN%20Certificate%20_%20Cognitive%20Class%20%281%29.pdf' },
+  { title: 'Coursera — Data Analyst Professional Track', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/data%20science%20.pdf' },
+  { title: 'Coursera — Data Exploration', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/data%20science%20%20%281%29.pdf' },
+  { title: 'Coursera — Cybersecurity Specialization', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/coursera%2C%20connect%20and%20protect%20.pdf' },
+  { title: 'Scaler — Java Certification', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/Java%20course%20completion%20in%20scalar.pdf' },
+  { title: 'Great Learning — Excel for Data Analysis' },
+  { title: 'Coursera — Ethical Hacking Certification', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/Advance%20penetration%20testing.pdf' },
+  { title: 'Cisco — Networking & Cybersecurity / CCNA', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/CCNAITNUpdated20250303-27-see3d2.pdf' },
+  { title: 'IAHV — Internship Certification' },
+  { title: 'Forage — Data Science Job Simulation' },
+  { title: 'Google — Foundations of Cybersecurity', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/data%20science%20%20%281%29.pdf' },
+  { title: 'Google — Connect & Protect: Network Security', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/coursera%2C%20connect%20and%20protect%20.pdf' },
+  { title: 'IBM — SQL & Relational Databases 101' },
+  { title: 'L&T EduTech — Internship Certification', url: 'https://aelxhrtr539redcp.public.blob.vercel-storage.com/L%26T%20edutech%20internship.pdf' },
 ];
 
 /* ============================================================
@@ -422,14 +422,21 @@ function App() {
                 <div>
                   <h3 className="exp-role">Data Analytics &amp; Content Operations Intern</h3>
                   <ul className="exp-bullets">
-                    <li>Programmed automated web-scraping and ETL cleansing pipelines in Python.</li>
                     <li>
-                      Consolidated operational workflows and standardised multi-source analytical
-                      reporting.
+                      During my internship, I worked on multiple academic and student-management related
+                      projects. I developed a timetable scheduling system with a frontend UI and an
+                      integrated recommendation system to improve scheduling efficiency and user
+                      experience.
                     </li>
                     <li>
-                      Built business intelligence dashboards and statistical summaries driving data-led
-                      decisions.
+                      I also created a mock test platform for students, where tests could be organized and
+                      monitored effectively. In addition, I was responsible for assigning projects to
+                      students and tracking their progress throughout the workflow.
+                    </li>
+                    <li>
+                      As part of my analyst role, I monitored student performance, analyzed workflow
+                      activities, and ensured that tasks and project submissions were progressing smoothly
+                      and on schedule.
                     </li>
                   </ul>
                 </div>
@@ -507,7 +514,7 @@ function App() {
               <span className="sec-num">02 — Projects</span>
               <h2 className="sec-title">Things I built end to end.</h2>
               <p className="sec-sub">
-                Two systems that go all the way down — from model training to the interface someone
+                Four systems that go all the way down — from model training to the interface someone
                 actually clicks.
               </p>
             </div>
@@ -565,6 +572,65 @@ function App() {
                   <span className="tag">Collaborative Filtering</span>
                   <span className="tag">NLP</span>
                   <span className="tag">LLM APIs</span>
+                </div>
+              </article>
+
+              <article className="proj reveal">
+                <div className="proj-top">
+                  <h3 className="proj-title">NetPlanner Pro</h3>
+                  <span className="proj-year">2025</span>
+                </div>
+                <ul className="proj-bullets">
+                  <li>
+                    NetPlanner Pro is a network subnetting and IP address management tool developed
+                    using Python and Streamlit.
+                  </li>
+                  <li>
+                    It automatically allocates IP addresses using VLSM and FLSM, calculates subnet
+                    masks, gateways, broadcast addresses, and usable IP ranges, and generates
+                    optimized network plans.
+                  </li>
+                  <li>
+                    I also implemented secure password generation, user IP assignments, and Excel and
+                    CSV exports to simplify network administration.
+                  </li>
+                </ul>
+                <div className="tags">
+                  <span className="tag">Python</span>
+                  <span className="tag">Streamlit</span>
+                  <span className="tag">VLSM / FLSM</span>
+                  <span className="tag">IPAM</span>
+                  <span className="tag">Excel / CSV Export</span>
+                </div>
+              </article>
+
+              <article className="proj reveal">
+                <div className="proj-top">
+                  <h3 className="proj-title">Granite Private RAG</h3>
+                  <span className="proj-year">2025</span>
+                </div>
+                <ul className="proj-bullets">
+                  <li>
+                    Granite Private RAG is an on-premises AI-powered knowledge assistant that allows
+                    organizations to ask questions about their internal documents and receive
+                    accurate, source-cited answers.
+                  </li>
+                  <li>
+                    It uses IBM Granite LLM, Ollama, FastAPI, Qdrant, and PostgreSQL to process
+                    documents, perform semantic and keyword searches, and generate answers.
+                  </li>
+                  <li>
+                    Its main goal is data privacy and security — all documents and queries remain
+                    within the organization's local network, without relying on cloud APIs.
+                  </li>
+                </ul>
+                <div className="tags">
+                  <span className="tag">IBM Granite</span>
+                  <span className="tag">Ollama</span>
+                  <span className="tag">FastAPI</span>
+                  <span className="tag">Qdrant</span>
+                  <span className="tag">PostgreSQL</span>
+                  <span className="tag">RAG</span>
                 </div>
               </article>
             </div>
@@ -700,16 +766,37 @@ function App() {
               <h2 className="sec-title">Seventeen and counting.</h2>
               <p className="sec-sub">
                 Formal credentials across data analysis, cybersecurity, networking, and Java.
+                Click any certificate to open it in a new tab.
               </p>
             </div>
 
             <div className="cert-grid reveal">
-              {CERTS.map((title, i) => (
-                <div className="cert" key={i}>
-                  <span className="cert-n">{String(i + 1).padStart(2, '0')}</span>
-                  <span className="cert-t">{title}</span>
-                </div>
-              ))}
+              {CERTS.map((cert, i) => {
+                const n = String(i + 1).padStart(2, '0');
+                const content = (
+                  <>
+                    <span className="cert-n">{n}</span>
+                    <span className="cert-t">{cert.title}</span>
+                  </>
+                );
+
+                return cert.url ? (
+                  <a
+                    className="cert cert-link"
+                    key={i}
+                    href={cert.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Open ${cert.title} certificate in new tab`}
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <div className="cert" key={i}>
+                    {content}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
